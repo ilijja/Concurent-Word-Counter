@@ -26,4 +26,5 @@ public enum Properties {
     public String toString() {
         return super.toString() + " = " + get();
     }
+
 }

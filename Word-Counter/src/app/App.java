@@ -38,7 +38,7 @@ public class App {
 
                 Properties property = Properties.valueOf(key);
                 property.set(value);
-                property.set(key);
+
             }
 
 
@@ -57,6 +57,7 @@ public class App {
     public void readInputs() {
 
         this.taskManager = new TaskManager();
+
         Scanner scanner = new Scanner(System.in);
 
         while(true) {
@@ -77,7 +78,7 @@ public class App {
                     taskManager.addPath(param);
                     break;
                 case "aw":
-
+                    taskManager.addWeb(param);
                     break;
                 case "get":
 

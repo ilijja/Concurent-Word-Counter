@@ -2,20 +2,27 @@ package crawler;
 
 import app.Assets;
 import app.Properties;
+import job.Job;
+import job.JobQueue;
 import job.ScanType;
 
 import java.io.File;
-import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DirectoryCrawler implements Crawler, Runnable{
 
     String path;
+    JobQueue jobQueue;
 
-    public DirectoryCrawler() {
+    private ConcurrentHashMap<String, FileInfo> fileInfos;
 
+    public DirectoryCrawler(JobQueue jobQueue) {
+        this.jobQueue = jobQueue;
+        this.fileInfos = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -46,18 +53,42 @@ public class DirectoryCrawler implements Crawler, Runnable{
 
             for(File file: this.findDirectories(files,root)){
                 if(file.getName().contains(Properties.FILE_CORPUS_PREFIX.get())){
-                    System.out.println(file.getName());
+                    this.addJob(file);
                 }
             }
 
-            System.out.println("\n");
+//     ad /Users/ilija/Desktop/Word-Counter/Word-Counter/test/example
+//            aw facebook.com
 
             try {
-                Thread.sleep(10000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
+        }
+    }
+
+    private void addJob(File root){
+
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        for(File file : root.listFiles()) {
+            String path = file.getAbsolutePath();
+            String lastModified = df.format(file.lastModified());
+            FileInfo fileInfo = new FileInfo(lastModified);
+
+            if(fileInfo.equals(this.fileInfos.get(path))) {
+                continue;
+            }
+
+            if(!fileInfo.equals(this.fileInfos.get(path))){
+                this.fileInfos.replace(path, fileInfo);
+            }
+            this.fileInfos.putIfAbsent(path, fileInfo);
+
+
+            this.jobQueue.enqueue(new Job(file.getAbsolutePath(), ScanType.FILE));
         }
 
     }
@@ -74,6 +105,35 @@ public class DirectoryCrawler implements Crawler, Runnable{
         }
 
         return files;
+    }
+
+
+    private class FileInfo{
+
+        String lastModified;
+
+        public FileInfo(String lastModified) {
+            this.lastModified = lastModified;
+        }
+
+        public String getLastModified() {
+            return lastModified;
+        }
+
+        public void setLastModified(String lastModified) {
+            this.lastModified = lastModified;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(obj instanceof FileInfo) {
+                FileInfo fileInfo = (FileInfo) obj;
+                return fileInfo.lastModified.equals(lastModified);
+            }
+
+            return false;
+        }
+
     }
 
 
