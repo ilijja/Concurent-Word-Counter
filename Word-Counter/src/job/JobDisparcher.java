@@ -1,8 +1,13 @@
 package job;
 
+import scanner.Scanner;
+
+import java.util.Map;
+
 public class JobDisparcher implements Runnable{
 
     private JobQueue jobs;
+    private Map<ScanType, Scanner> scanners;
 
     public JobDisparcher(JobQueue jobs) {
         this.jobs = jobs;
@@ -15,7 +20,8 @@ public class JobDisparcher implements Runnable{
 
             Job job = jobs.dequeue();
             ScanType scanType = job.getScanType();
-            System.out.println(job.getPath());
+
+            scanners.get(scanType).scanJob(job);
 
             try {
                 Thread.sleep(2000);
