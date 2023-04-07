@@ -4,6 +4,6 @@ import job.Job;
 
 public interface Scanner {
 
-    String scanJob(Job job);
+    void submitTask(Job job);
 
 }

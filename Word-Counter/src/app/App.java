@@ -14,7 +14,7 @@ public class App {
 
     public void init(){
         this.load();
-        this.readInputs();
+        this.readInput();
     }
 
 
@@ -54,7 +54,7 @@ public class App {
 
     }
 
-    public void readInputs() {
+    public void readInput() {
 
         this.taskManager = new TaskManager();
 

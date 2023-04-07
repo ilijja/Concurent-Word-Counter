@@ -1,7 +1,10 @@
 package job;
 
+import scanner.FileScanner;
 import scanner.Scanner;
+import scanner.WebScanner;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class JobDisparcher implements Runnable{
@@ -9,8 +12,15 @@ public class JobDisparcher implements Runnable{
     private JobQueue jobs;
     private Map<ScanType, Scanner> scanners;
 
+
     public JobDisparcher(JobQueue jobs) {
         this.jobs = jobs;
+
+        scanners = new HashMap<>();
+
+        scanners.put(ScanType.FILE, new FileScanner());
+        scanners.put(ScanType.WEB, new WebScanner());
+
     }
 
     @Override
@@ -19,16 +29,17 @@ public class JobDisparcher implements Runnable{
         while(true) {
 
             Job job = jobs.dequeue();
-            ScanType scanType = job.getScanType();
-
-            scanners.get(scanType).scanJob(job);
+            scanners.get(job.getScanType()).submitTask(job);
 
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
+
 }
+
+

@@ -61,7 +61,7 @@ public class DirectoryCrawler implements Crawler, Runnable{
 //            aw facebook.com
 
             try {
-                Thread.sleep(2000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
