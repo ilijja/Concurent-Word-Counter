@@ -61,7 +61,7 @@ public class DirectoryCrawler implements Crawler, Runnable{
 //            aw facebook.com
 
             try {
-                Thread.sleep(500);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -72,8 +72,10 @@ public class DirectoryCrawler implements Crawler, Runnable{
     private void addJob(File root){
 
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        boolean flag = false;
 
         for(File file : root.listFiles()) {
+            flag = false;
             String path = file.getAbsolutePath();
             String lastModified = df.format(file.lastModified());
             FileInfo fileInfo = new FileInfo(lastModified);
@@ -82,13 +84,23 @@ public class DirectoryCrawler implements Crawler, Runnable{
                 continue;
             }
 
+            if(this.fileInfos.get(path) == null){
+                this.fileInfos.putIfAbsent(path, fileInfo);
+                flag = true;
+                continue;
+            }
+
             if(!fileInfo.equals(this.fileInfos.get(path))){
                 this.fileInfos.replace(path, fileInfo);
+                flag = true;
+                break;
             }
-            this.fileInfos.putIfAbsent(path, fileInfo);
 
 
-            this.jobQueue.enqueue(new Job(file.getAbsolutePath(), ScanType.FILE));
+        }
+
+        if(flag){
+            this.jobQueue.enqueue(new Job(root.getAbsolutePath(), ScanType.FILE));
         }
 
     }
@@ -134,6 +146,11 @@ public class DirectoryCrawler implements Crawler, Runnable{
             return false;
         }
 
+
+        @Override
+        public String toString() {
+            return lastModified;
+        }
     }
 
 

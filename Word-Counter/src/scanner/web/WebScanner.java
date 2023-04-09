@@ -1,11 +1,12 @@
-package scanner;
+package scanner.web;
 
 import job.Job;
+import scanner.Scanner;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class WebScanner implements Scanner{
+public class WebScanner implements Scanner {
 
 
     private final ExecutorService pool;

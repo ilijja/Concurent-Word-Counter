@@ -1,8 +1,8 @@
 package job;
 
-import scanner.FileScanner;
+import scanner.file.FileScanner;
 import scanner.Scanner;
-import scanner.WebScanner;
+import scanner.web.WebScanner;
 
 import java.util.HashMap;
 import java.util.Map;
