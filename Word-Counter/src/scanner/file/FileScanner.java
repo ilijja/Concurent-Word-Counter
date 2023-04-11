@@ -18,11 +18,14 @@ public class FileScanner implements Scanner {
 
     private Map<String, Job> jobs;
 
+    List<File> filesToProcess;
+
     public FileScanner() {
         this.size = new AtomicLong(0);
         this.pool = Executors.newCachedThreadPool();
         this.jobs = new ConcurrentHashMap<>();
         this.FILE_SCANNING_SIZE_LIMIT = Long.valueOf(Properties.FILE_SCANNING_SIZE_LIMIT.get());
+        this.filesToProcess = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -36,8 +39,7 @@ public class FileScanner implements Scanner {
 
         jobs.put(job.getPath(), job);
 
-
-        List<File> filesToProcess = new ArrayList<>();
+//        ad /Users/ilija/Desktop/Word-Counter/Word-Counter/test/example
 
         long currentSize;
 
@@ -90,8 +92,12 @@ public class FileScanner implements Scanner {
 
                 jobs.get(file.getParentFile().getAbsolutePath()).setResult(value);
 
-//                System.out.println(jobs.get(file.getParentFile().getAbsolutePath()).getResult());
             }
+        }
+
+
+        for(String key: jobs.keySet()){
+            System.out.println(jobs.get(key).getResult() + " " + new File(jobs.get(key).getPath()).getName());
         }
 
 

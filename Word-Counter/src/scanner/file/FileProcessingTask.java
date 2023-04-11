@@ -32,7 +32,7 @@ public class FileProcessingTask implements Callable<List<Map<String, Map<String,
         List<Map<String, Map<String, Integer>>> results = new CopyOnWriteArrayList<>();
 
         for(File file:this.files){
-            System.out.println(file.getName());
+
             Map<String, Map<String, Integer>> fileResult = new ConcurrentHashMap<>();
             Map<String, Integer> counts = new ConcurrentHashMap<>();
 
