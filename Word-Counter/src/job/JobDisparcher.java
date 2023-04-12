@@ -19,7 +19,7 @@ public class JobDisparcher implements Runnable{
         scanners = new HashMap<>();
 
         scanners.put(ScanType.FILE, new FileScanner());
-        scanners.put(ScanType.WEB, new WebScanner());
+        scanners.put(ScanType.WEB, new WebScanner(jobs));
 
     }
 

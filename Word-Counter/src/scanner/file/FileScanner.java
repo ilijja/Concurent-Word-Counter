@@ -20,12 +20,16 @@ public class FileScanner implements Scanner {
 
     List<File> filesToProcess;
 
+    List<Future<List<Map<String, Map<String, Integer>>>>> futures;
+
+
     public FileScanner() {
         this.size = new AtomicLong(0);
         this.pool = Executors.newCachedThreadPool();
         this.jobs = new ConcurrentHashMap<>();
         this.FILE_SCANNING_SIZE_LIMIT = Long.valueOf(Properties.FILE_SCANNING_SIZE_LIMIT.get());
         this.filesToProcess = new CopyOnWriteArrayList<>();
+        this.futures = new ArrayList<>();
     }
 
     @Override
@@ -70,6 +74,7 @@ public class FileScanner implements Scanner {
         Map<String, Integer> corpusResults = new HashMap<>();
 
         for (Future<List<Map<String, Map<String, Integer>>>> future : futures) {
+            System.out.println(futures.size());
             try {
                 List<Map<String, Map<String, Integer>>> result = future.get();
                 mergeResults(result);
@@ -96,9 +101,9 @@ public class FileScanner implements Scanner {
         }
 
 
-        for(String key: jobs.keySet()){
-            System.out.println(jobs.get(key).getResult() + " " + new File(jobs.get(key).getPath()).getName());
-        }
+//        for(String key: jobs.keySet()){
+//            System.out.println(jobs.get(key).getResult() + " " + new File(jobs.get(key).getPath()).getName());
+//        }
 
 
 

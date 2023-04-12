@@ -5,13 +5,14 @@ import app.Properties;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class ScanningJobQueue implements JobQueue{
 
     private BlockingQueue<Job> jobs;
 
     public ScanningJobQueue() {
-        this.jobs = new ArrayBlockingQueue<>(10);
+        this.jobs = new LinkedBlockingDeque<>();
     }
 
     @Override

@@ -9,9 +9,17 @@ public class Job {
     private ScanType scanType;
     private Map<String,Integer> result;
 
+    private boolean scanned;
+
     public Job(String path, ScanType scanType) {
         this.path = path;
         this.scanType = scanType;
+    }
+
+    public Job(String path, ScanType scanType, boolean scanned) {
+        this.path = path;
+        this.scanType = scanType;
+        this.scanned = scanned;
     }
 
     public String getPath() {
@@ -54,4 +62,11 @@ public class Job {
 
     }
 
+    public boolean isScanned() {
+        return scanned;
+    }
+
+    public void setScanned(boolean scanned) {
+        this.scanned = scanned;
+    }
 }

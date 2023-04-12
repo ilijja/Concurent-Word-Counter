@@ -58,7 +58,7 @@ public class DirectoryCrawler implements Crawler, Runnable{
             }
 
 //     ad /Users/ilija/Desktop/Word-Counter/Word-Counter/test/example
-//            aw facebook.com
+//            aw https://www.techniquehow.com/fake-snapchat-account-checker/
 
             try {
                 Thread.sleep(5000);
