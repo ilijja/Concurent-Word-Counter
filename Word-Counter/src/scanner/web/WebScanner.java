@@ -7,6 +7,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import result.ResultRetriever;
 import scanner.Scanner;
 
 import java.io.IOException;
@@ -23,10 +24,12 @@ public class WebScanner implements Scanner {
     private final ExecutorService pool;
     private JobQueue jobQueue;
 
+    private ResultRetriever resultRetriever;
 
-    public WebScanner(JobQueue jobQueue) {
+    public WebScanner(JobQueue jobQueue, ResultRetriever resultRetriever) {
         this.pool = Executors.newCachedThreadPool();
         this.jobQueue = jobQueue;
+        this.resultRetriever = resultRetriever;
     }
 
     @Override

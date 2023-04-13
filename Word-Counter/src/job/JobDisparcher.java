@@ -1,5 +1,6 @@
 package job;
 
+import result.ResultRetriever;
 import scanner.file.FileScanner;
 import scanner.Scanner;
 import scanner.web.WebScanner;
@@ -13,13 +14,13 @@ public class JobDisparcher implements Runnable{
     private Map<ScanType, Scanner> scanners;
 
 
-    public JobDisparcher(JobQueue jobs) {
+    public JobDisparcher(JobQueue jobs, ResultRetriever resultRetriever) {
         this.jobs = jobs;
 
         scanners = new HashMap<>();
 
-        scanners.put(ScanType.FILE, new FileScanner());
-        scanners.put(ScanType.WEB, new WebScanner(jobs));
+        scanners.put(ScanType.FILE, new FileScanner(resultRetriever));
+        scanners.put(ScanType.WEB, new WebScanner(jobs, resultRetriever));
 
     }
 

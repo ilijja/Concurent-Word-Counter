@@ -9,7 +9,6 @@ import java.util.Scanner;
 
 public class App {
 
-
     TaskManager taskManager;
 
     public void init(){
@@ -81,12 +80,12 @@ public class App {
                     taskManager.addWeb(param);
                     break;
                 case "get":
-
-                    break;
-                case "cfs":
-
+                    taskManager.getResult(param);
                     break;
                 case "query":
+                    taskManager.queryResult(param);
+                    break;
+                case "cfs":
 
                     break;
                 case "cws":
