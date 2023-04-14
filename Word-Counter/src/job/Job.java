@@ -7,7 +7,6 @@ public class Job {
 
     private String path;
     private ScanType scanType;
-    private Map<String,Integer> result;
 
     private boolean scanned;
 
@@ -38,29 +37,6 @@ public class Job {
         this.scanType = scanType;
     }
 
-    public Map<String, Integer> getResult() {
-        return result;
-    }
-
-    public void setResult(Map<String, Integer> result) {
-
-        if (this.result == null) {
-            this.result = result;
-            return;
-        }
-
-        for (String key : result.keySet()) {
-            Integer currentValue = this.result.get(key);
-            Integer valueToAdd = result.get(key);
-
-            if (currentValue != null) {
-                this.result.put(key, currentValue + valueToAdd);
-            } else {
-                this.result.put(key, valueToAdd);
-            }
-        }
-
-    }
 
     public boolean isScanned() {
         return scanned;
@@ -69,4 +45,5 @@ public class Job {
     public void setScanned(boolean scanned) {
         this.scanned = scanned;
     }
+
 }

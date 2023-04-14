@@ -5,6 +5,8 @@ import app.Properties;
 import job.Job;
 import job.JobQueue;
 import job.ScanType;
+import result.Result;
+import result.ResultRetriever;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -18,11 +20,14 @@ public class DirectoryCrawler implements Crawler, Runnable{
     String path;
     JobQueue jobQueue;
 
+    ResultRetriever resultRetriever;
+
     private ConcurrentHashMap<String, FileInfo> fileInfos;
 
-    public DirectoryCrawler(JobQueue jobQueue) {
+    public DirectoryCrawler(JobQueue jobQueue, ResultRetriever resultRetriever) {
         this.jobQueue = jobQueue;
         this.fileInfos = new ConcurrentHashMap<>();
+        this.resultRetriever = resultRetriever;
     }
 
     @Override
@@ -61,7 +66,7 @@ public class DirectoryCrawler implements Crawler, Runnable{
 //            aw https://www.techniquehow.com/fake-snapchat-account-checker/
 
             try {
-                Thread.sleep(5000);
+                Thread.sleep(Long.valueOf(Properties.DIR_CRAWLER_SLEEP_TIME.get()));
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

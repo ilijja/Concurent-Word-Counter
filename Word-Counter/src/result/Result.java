@@ -8,8 +8,8 @@ public class Result {
 
     private String path;
     private Map<String, Integer> counts;
-
     private ScanType scanType;
+
 
     public Result(String path, Map<String, Integer> counts, ScanType scanType) {
         this.path = path;
@@ -37,7 +37,7 @@ public class Result {
         return scanType;
     }
 
-    public void setScanType(ScanType scanType) {
-        this.scanType = scanType;
+    public boolean isDone(){
+        return counts != null;
     }
 }

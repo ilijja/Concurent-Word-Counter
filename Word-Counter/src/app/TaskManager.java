@@ -28,7 +28,7 @@ public class TaskManager {
         this.jobQueue = new ScanningJobQueue();
         this.resultRetriever = new ResultRetrieverPool();
 
-        this.crawlers.put(ScanType.FILE, new DirectoryCrawler(jobQueue));
+        this.crawlers.put(ScanType.FILE, new DirectoryCrawler(jobQueue, resultRetriever));
         this.crawlers.put(ScanType.WEB, new WebCrawler(jobQueue));
         this.jobDisparcher = new JobDisparcher(jobQueue, resultRetriever);
 

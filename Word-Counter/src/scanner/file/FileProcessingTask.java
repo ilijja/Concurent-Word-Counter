@@ -4,11 +4,9 @@ import app.Properties;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.Key;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +24,7 @@ public class FileProcessingTask implements Callable<List<Map<String, Map<String,
 
 
     @Override
-    public List<Map<String, Map<String, Integer>>> call() throws Exception {
+    public List<Map<String, Map<String, Integer>>> call() {
 
 
         List<Map<String, Map<String, Integer>>> results = new CopyOnWriteArrayList<>();

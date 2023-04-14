@@ -4,62 +4,69 @@ import app.Properties;
 import job.Job;
 import job.JobQueue;
 import job.ScanType;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import result.Result;
+import result.ResultRetriever;
 
-import javax.print.Doc;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class WebProcessingTask implements Callable<Map<String, Map<String, Integer>>> {
+public class WebProcessingTask implements Callable<Map<String, Integer>> {
 
     Job job;
     JobQueue jobQueue;
 
-    public WebProcessingTask(Job job, JobQueue jobQueue) {
+    ResultRetriever resultRetriever;
+
+    public WebProcessingTask(Job job, JobQueue jobQueue, ResultRetriever resultRetriever) {
         this.job = job;
         this.jobQueue = jobQueue;
+        this.resultRetriever = resultRetriever;
     }
 
     @Override
-    public Map<String, Map<String, Integer>> call() throws Exception {
+    public Map<String, Integer> call() {
 
-        Map<String, Map<String, Integer>> results = new HashMap<>();
+        System.out.println("Starting web scan for: " + job.getPath() );
 
-        results.put(job.getPath(), countWords(job));
+        Map<String,Integer> counts = countWords(job);
 
 
-        if(job.isScanned() == false){
+        if(!job.isScanned()){
             findHops(job);
         }
 
-
         job.setScanned(true);
 
-
-        return results;
+        return counts;
     }
 
-    public Map<String,Integer> countWords(Job job){
-
+    public Map<String, Integer> countWords(Job job) {
         Map<String, Integer> counts = new HashMap<>();
-        Document doc = null;
+        Document doc;
+
+
+        String[] keywords = Properties.KEYWORDS.get().split(",");
+        for (String keyword : keywords) {
+            counts.put(keyword, 0);
+        }
+
         try {
             doc = Jsoup.connect(job.getPath()).get();
             String content = doc.body().text();
 
-            String[] keywords = Properties.KEYWORDS.get().split(",");
-
-            for(String keyword: keywords){
-                counts.put(keyword, countOccurrences(content, keyword) );
+            for (String keyword : keywords) {
+                counts.put(keyword, countOccurrences(content, keyword));
             }
+
+        } catch (HttpStatusException e) {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -67,6 +74,7 @@ public class WebProcessingTask implements Callable<Map<String, Map<String, Integ
 
         return counts;
     }
+
 
     public static int countOccurrences(String text, String word) {
         int count = 0;
@@ -110,7 +118,6 @@ public class WebProcessingTask implements Callable<Map<String, Map<String, Integ
 
                     } catch (IOException e) {
                         System.err.println("Error connecting to URL: " + url);
-                        continue;
                     }
                 } else {
                     System.err.println("Ignoring non-web URL: " + url);
@@ -124,15 +131,18 @@ public class WebProcessingTask implements Callable<Map<String, Map<String, Integ
         for (Integer i : hops.keySet()) {
             for (String item : hops.get(i)) {
 
-                if (i == 0) {
-                    continue;
-                }
-
                 if (!(item.startsWith("http://") || item.startsWith("https://"))) {
                     continue;
                 }
 
+                this.resultRetriever.addResult(new Result(item, null, ScanType.WEB));
+
+                if (i == 0) {
+                    continue;
+                }
+
                 Job newJob = new Job(item, ScanType.WEB, true);
+
                 jobQueue.enqueue(newJob);
             }
         }

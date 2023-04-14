@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class FileScanner implements Scanner {
 
     private final long FILE_SCANNING_SIZE_LIMIT;
-    private AtomicLong size;
-    private final ExecutorService pool;
+    private final AtomicLong size;
+    private ExecutorService pool;
     private Map<String, Job> jobs;
     List<File> filesToProcess;
 //    List<Future<List<Map<String, Map<String, Integer>>>>> futures;
@@ -38,10 +38,15 @@ public class FileScanner implements Scanner {
         this.processCorpus(job);
     }
 
+    @Override
+    public void stop() {
+        pool.shutdown();
+    }
 
     private void processCorpus(Job job) {
         File corpus = new File(job.getPath());
 
+        System.out.println("Starting file scan for file|" + corpus.getName());
 
         jobs.put(job.getPath(), job);
 
@@ -54,16 +59,22 @@ public class FileScanner implements Scanner {
 
         for (File file : corpus.listFiles()) {
 
+            resultRetriever.addResult(new Result(file.getPath(), null, ScanType.FILE));
+
             currentSize = size.addAndGet(file.length());
             filesToProcess.add(file);
 
             if (currentSize >= this.FILE_SCANNING_SIZE_LIMIT) {
-
                 Future<List<Map<String, Map<String, Integer>>>> future = pool.submit(new FileProcessingTask(filesToProcess));
                 futures.add(future);
                 filesToProcess = new ArrayList<>();
                 size.set(0);
             }
+        }
+
+        if(!filesToProcess.isEmpty()){
+            Future<List<Map<String, Map<String, Integer>>>> future = pool.submit(new FileProcessingTask(filesToProcess));
+            futures.add(future);
         }
 
 
@@ -90,18 +101,10 @@ public class FileScanner implements Scanner {
 
         for (Map<String, Map<String, Integer>> set : result) {
             for (String key : set.keySet()) {
-                Map<String, Integer> value = set.get(key);
-                Result res = new Result(key, value, ScanType.FILE);
-                resultRetriever.addResult(res);
+                Map<String, Integer> counts = set.get(key);
+                resultRetriever.setResult(key, counts);
             }
         }
-
-
-//        for(String key: jobs.keySet()){
-//            System.out.println(jobs.get(key).getResult() + " " + new File(jobs.get(key).getPath()).getName());
-//        }
-
-
 
     }
 

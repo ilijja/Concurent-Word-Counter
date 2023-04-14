@@ -1,17 +1,11 @@
 package scanner.web;
 
-import app.Properties;
 import job.Job;
 import job.JobQueue;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import result.ResultRetriever;
 import scanner.Scanner;
 
-import java.io.IOException;
-import java.util.List;
+
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -37,11 +31,18 @@ public class WebScanner implements Scanner {
         scanJobPath(job);
     }
 
+    @Override
+    public void stop() {
+        pool.shutdown();
+    }
+
     private void scanJobPath(Job job) {
-        Future<Map<String, Map<String, Integer>>> future = this.pool.submit(new WebProcessingTask(job, jobQueue));
+
+
+        Future<Map<String, Integer>> future = this.pool.submit(new WebProcessingTask(job, jobQueue, resultRetriever));
 
         try {
-            System.out.println(future.get());
+            resultRetriever.setResult(job.getPath(), future.get());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
