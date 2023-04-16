@@ -8,13 +8,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.RecursiveTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FileProcessingTask implements Callable<List<Map<String, Map<String, Integer>>>> {
+public class FileProcessingTask extends RecursiveTask<List<Map<String, Map<String, Integer>>>> {
 
     private List<File> files;
 
@@ -22,19 +22,15 @@ public class FileProcessingTask implements Callable<List<Map<String, Map<String,
         this.files = files;
     }
 
-
     @Override
-    public List<Map<String, Map<String, Integer>>> call() {
-
-
+    protected List<Map<String, Map<String, Integer>>> compute() {
         List<Map<String, Map<String, Integer>>> results = new CopyOnWriteArrayList<>();
 
-        for(File file:this.files){
-
+        for (File file : this.files) {
             Map<String, Map<String, Integer>> fileResult = new ConcurrentHashMap<>();
             Map<String, Integer> counts = new ConcurrentHashMap<>();
 
-            fileResult.put(file.getAbsolutePath(), countWords(counts,file));
+            fileResult.put(file.getAbsolutePath(), countWords(counts, file));
             results.add(fileResult);
         }
 
@@ -51,12 +47,11 @@ public class FileProcessingTask implements Callable<List<Map<String, Map<String,
         }
     }
 
-    public Map<String,Integer> countWords(Map<String,Integer> counts, File file){
-
+    public Map<String, Integer> countWords(Map<String, Integer> counts, File file) {
         String[] keywords = Properties.KEYWORDS.get().split(",");
 
-        for(String keyword: keywords){
-           counts.put(keyword, countOccurrences(readFileToString(file), keyword) );
+        for (String keyword : keywords) {
+            counts.put(keyword, countOccurrences(readFileToString(file), keyword));
         }
 
         return counts;
@@ -73,5 +68,4 @@ public class FileProcessingTask implements Callable<List<Map<String, Map<String,
 
         return count;
     }
-
 }

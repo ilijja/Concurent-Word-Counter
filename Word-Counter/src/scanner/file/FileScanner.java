@@ -16,22 +16,26 @@ public class FileScanner implements Scanner {
 
     private final long FILE_SCANNING_SIZE_LIMIT;
     private final AtomicLong size;
-    private ExecutorService pool;
+    private ForkJoinPool pool;
     private Map<String, Job> jobs;
     List<File> filesToProcess;
-//    List<Future<List<Map<String, Map<String, Integer>>>>> futures;
     ResultRetriever resultRetriever;
-
 
     public FileScanner(ResultRetriever resultRetriever) {
         this.size = new AtomicLong(0);
-        this.pool = Executors.newCachedThreadPool();
+        this.pool = new ForkJoinPool();
         this.jobs = new ConcurrentHashMap<>();
         this.FILE_SCANNING_SIZE_LIMIT = Long.valueOf(Properties.FILE_SCANNING_SIZE_LIMIT.get());
         this.filesToProcess = new CopyOnWriteArrayList<>();
-//        this.futures = new ArrayList<>();
         this.resultRetriever = resultRetriever;
     }
+
+    //ad /Users/ilija/Desktop/Word-Counter/Word-Counter/test/example
+//get file|corpus_mcfly
+//query file|corpus_mcfly
+//get file|corpus_riker
+//query file|corpus_mcfly
+//query file|summary
 
     @Override
     public void submitTask(Job job) {
@@ -44,18 +48,21 @@ public class FileScanner implements Scanner {
     }
 
     private void processCorpus(Job job) {
+
+        if (job.getScanType() == ScanType.POISON) {
+            stop();
+            return;
+        }
+
         File corpus = new File(job.getPath());
 
         System.out.println("Starting file scan for file|" + corpus.getName());
 
         jobs.put(job.getPath(), job);
 
-//        ad /Users/ilija/Desktop/Word-Counter/Word-Counter/test/example
-
         long currentSize;
 
-        List<Future<List<Map<String, Map<String, Integer>>>>> futures = new ArrayList<>();
-
+        List<FileProcessingTask> tasks = new ArrayList<>();
 
         for (File file : corpus.listFiles()) {
 
@@ -65,36 +72,29 @@ public class FileScanner implements Scanner {
             filesToProcess.add(file);
 
             if (currentSize >= this.FILE_SCANNING_SIZE_LIMIT) {
-                Future<List<Map<String, Map<String, Integer>>>> future = pool.submit(new FileProcessingTask(filesToProcess));
-                futures.add(future);
+                FileProcessingTask task = new FileProcessingTask(filesToProcess);
+                tasks.add(task);
                 filesToProcess = new ArrayList<>();
                 size.set(0);
             }
         }
 
-        if(!filesToProcess.isEmpty()){
-            Future<List<Map<String, Map<String, Integer>>>> future = pool.submit(new FileProcessingTask(filesToProcess));
-            futures.add(future);
+        if (!filesToProcess.isEmpty()) {
+            FileProcessingTask task = new FileProcessingTask(filesToProcess);
+            tasks.add(task);
         }
 
-
-        finishCorpusProcessing(futures);
-
+        finishCorpusProcessing(tasks);
     }
 
+    private void finishCorpusProcessing(List<FileProcessingTask> tasks) {
+        List<Map<String, Map<String, Integer>>> results = new ArrayList<>();
 
-    private void finishCorpusProcessing(List<Future<List<Map<String, Map<String, Integer>>>>> futures) {
-
-
-        for (Future<List<Map<String, Map<String, Integer>>>> future : futures) {
-            try {
-                List<Map<String, Map<String, Integer>>> result = future.get();
-                mergeResults(result);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
+        for (FileProcessingTask task : tasks) {
+            results.addAll(pool.invoke(task));
         }
 
+        mergeResults(results);
     }
 
     private void mergeResults(List<Map<String, Map<String, Integer>>> result) {
@@ -105,9 +105,5 @@ public class FileScanner implements Scanner {
                 resultRetriever.setResult(key, counts);
             }
         }
-
     }
-
-
-
 }

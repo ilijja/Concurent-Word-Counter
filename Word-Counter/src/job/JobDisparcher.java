@@ -30,6 +30,11 @@ public class JobDisparcher implements Runnable{
         while(true) {
 
             Job job = jobs.dequeue();
+
+            if(job.getScanType() == ScanType.POISON){
+                break;
+            }
+
             scanners.get(job.getScanType()).submitTask(job);
 
             try {

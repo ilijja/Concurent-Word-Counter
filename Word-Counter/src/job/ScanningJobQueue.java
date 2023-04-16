@@ -1,9 +1,6 @@
 package job;
 
-import app.Assets;
-import app.Properties;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 

@@ -15,6 +15,10 @@ public class Job {
         this.scanType = scanType;
     }
 
+    public Job() {
+        this(null, ScanType.POISON);
+    }
+
     public Job(String path, ScanType scanType, boolean scanned) {
         this.path = path;
         this.scanType = scanType;

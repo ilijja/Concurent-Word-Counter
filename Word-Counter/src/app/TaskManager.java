@@ -10,11 +10,9 @@ import result.ResultType;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class TaskManager {
 
-    private Crawler crawler;
     private JobQueue jobQueue;
     private JobDisparcher jobDisparcher;
 
@@ -26,10 +24,11 @@ public class TaskManager {
         this.crawlers = new HashMap<>();
 
         this.jobQueue = new ScanningJobQueue();
-        this.resultRetriever = new ResultRetrieverPool();
 
-        this.crawlers.put(ScanType.FILE, new DirectoryCrawler(jobQueue, resultRetriever));
         this.crawlers.put(ScanType.WEB, new WebCrawler(jobQueue));
+        this.crawlers.put(ScanType.FILE, new DirectoryCrawler(jobQueue));
+
+        this.resultRetriever = new ResultRetrieverPool();
         this.jobDisparcher = new JobDisparcher(jobQueue, resultRetriever);
 
 
@@ -54,10 +53,27 @@ public class TaskManager {
         resultRetriever.executeQuery(ResultType.QUERY, ScanType.valueOf(params[0].toUpperCase()), params[1]);
     }
 
+    public void clearSummary(ScanType scanType){
+        resultRetriever.clearSummary(scanType);
+    }
+
     public void startJobDispatcher(){
         Thread thread = new Thread(jobDisparcher);
         thread.start();
     }
+
+    public void stopThreads(){
+
+        System.out.println("Stopping threads");
+
+        resultRetriever.stop();
+        for(Crawler crawler:crawlers.values()){
+            crawler.stop();
+        }
+        jobQueue.enqueue(new Job());
+
+    }
+
 
 
 }

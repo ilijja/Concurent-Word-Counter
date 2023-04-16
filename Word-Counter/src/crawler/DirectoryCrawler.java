@@ -20,14 +20,14 @@ public class DirectoryCrawler implements Crawler, Runnable{
     String path;
     JobQueue jobQueue;
 
-    ResultRetriever resultRetriever;
+    private volatile boolean flag;
 
     private ConcurrentHashMap<String, FileInfo> fileInfos;
 
-    public DirectoryCrawler(JobQueue jobQueue, ResultRetriever resultRetriever) {
+    public DirectoryCrawler(JobQueue jobQueue) {
         this.jobQueue = jobQueue;
         this.fileInfos = new ConcurrentHashMap<>();
-        this.resultRetriever = resultRetriever;
+        this.flag = true;
     }
 
     @Override
@@ -39,14 +39,12 @@ public class DirectoryCrawler implements Crawler, Runnable{
 
     @Override
     public void stop() {
-
+        this.flag = false;
     }
 
     @Override
     public void run() {
-
-        while(!Thread.currentThread().isInterrupted()) {
-
+        while (flag){
             List<File> files = new ArrayList<>();
 
             File root = new File(path);
@@ -62,15 +60,11 @@ public class DirectoryCrawler implements Crawler, Runnable{
                 }
             }
 
-//     ad /Users/ilija/Desktop/Word-Counter/Word-Counter/test/example
-//            aw https://www.techniquehow.com/fake-snapchat-account-checker/
-
             try {
                 Thread.sleep(Long.valueOf(Properties.DIR_CRAWLER_SLEEP_TIME.get()));
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
         }
     }
 

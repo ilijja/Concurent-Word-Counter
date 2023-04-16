@@ -2,6 +2,7 @@ package scanner.web;
 
 import job.Job;
 import job.JobQueue;
+import job.ScanType;
 import result.ResultRetriever;
 import scanner.Scanner;
 
@@ -37,6 +38,11 @@ public class WebScanner implements Scanner {
     }
 
     private void scanJobPath(Job job) {
+
+        if(job.getScanType() == ScanType.POISON){
+            stop();
+            return;
+        }
 
 
         Future<Map<String, Integer>> future = this.pool.submit(new WebProcessingTask(job, jobQueue, resultRetriever));

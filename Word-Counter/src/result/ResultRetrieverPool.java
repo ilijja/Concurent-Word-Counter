@@ -9,11 +9,14 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ResultRetrieverPool implements ResultRetriever{
 
     private List<Result> results;
     private ExecutorService pool;
+
+
 
 
     public ResultRetrieverPool() {
@@ -46,9 +49,19 @@ public class ResultRetrieverPool implements ResultRetriever{
         }
     }
 
+
+
     @Override
     public void stop() {
         pool.shutdown();
+    }
+
+    @Override
+    public void clearSummary(ScanType scanType) {
+        System.out.println("Clearing " +  scanType + " summary");
+        results = results.stream()
+                .filter(item -> item.getScanType() != scanType)
+                .collect(Collectors.toList());
     }
 
     private void executeGet(ScanType scanType, String name){
@@ -203,7 +216,7 @@ public class ResultRetrieverPool implements ResultRetriever{
 
 //aw https://www.swimuniversity.com/hot-tub-maintenance/
     //get web|summary
-//get web|swimuniversity.com
+//query web|swimuniversity.com
 
 
 //    aw https://www.gatesnotes.com/2019-Annual-Letter
@@ -217,7 +230,6 @@ public class ResultRetrieverPool implements ResultRetriever{
         do {
             allCountsAvailable = true;
             for (Result result : this.results) {
-                // TODO: ovde izmeni za if ne treba result nego name
                 if(result.getScanType()!=ScanType.WEB || getParent(result)==null){
                     continue;
                 }

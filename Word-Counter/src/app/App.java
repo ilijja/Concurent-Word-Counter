@@ -1,6 +1,7 @@
 package app;
 
 import crawler.Crawler;
+import job.ScanType;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -86,14 +87,13 @@ public class App {
                     taskManager.queryResult(param);
                     break;
                 case "cfs":
-
+                    taskManager.clearSummary(ScanType.FILE);
                     break;
                 case "cws":
-
+                    taskManager.clearSummary(ScanType.WEB);
                     break;
                 case "stop":
-
-                    scanner.close();
+                    taskManager.stopThreads();
                     return;
                 default:
                     System.out.println("Error command");

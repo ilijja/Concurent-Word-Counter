@@ -38,7 +38,6 @@ public class WebProcessingTask implements Callable<Map<String, Integer>> {
 
         Map<String,Integer> counts = countWords(job);
 
-
         if(!job.isScanned()){
             findHops(job);
         }
@@ -67,7 +66,7 @@ public class WebProcessingTask implements Callable<Map<String, Integer>> {
             }
 
         } catch (HttpStatusException e) {
-
+            System.out.println("Http error");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -97,7 +96,7 @@ public class WebProcessingTask implements Callable<Map<String, Integer>> {
         base.add(job.getPath());
         hops.put(0, base);
 
-        System.out.println(hopCount);
+
         for (int i = 0; i < hopCount; i++) {
 
             Set<String> currentHop = new HashSet<>();
