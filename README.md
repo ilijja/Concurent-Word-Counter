@@ -35,4 +35,48 @@ public interface ScanningJob {
     String getQuery();              // Query string identifying the corpus/job
     Future<Map<String, Integer>> initiate();  // Starts the scanning job asynchronously and returns a Future with results
 }
+```
+
+
+## Features
+
+- **Concurrent Processing:**  
+  Utilizes multiple threads and thread pools to scan files and web pages in parallel for efficient keyword counting.
+
+- **Configurable Corpora:**  
+  Directories to scan and their prefix identifiers are set via configuration files.
+
+- **Error Handling:**  
+  The system handles errors without crashing and informs the user about issues.
+
+- **CLI Interaction:**  
+  Users control the system using command-line commands to start scans, add corpora, and view results.
+
+- **Efficient Scanning:**  
+  Avoids rescanning unchanged files by tracking last modified timestamps.
+
+## Usage
+
+- Configure the directories and prefixes in the configuration file.
+
+- Use CLI commands to start scanning jobs for specified corpora.
+
+- View keyword counts per corpus or aggregated across corpora.
+
+- Add new corpora dynamically by placing appropriately prefixed directories in monitored paths.
+
+## Technologies
+
+- Concurrent utilities: `ExecutorService`, `Future`, blocking queues
+
+- Network handling for web crawling and HTML parsing
+
+## Notes
+
+- Keyword matching is **case-sensitive** and matches whole words only.
+
+- Designed for extensibility: new components and scanning methods can be integrated easily.
+
+- Uses ASCII encoding for local file processing.
+
 
